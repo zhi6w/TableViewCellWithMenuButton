@@ -85,6 +85,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         cell?.menu = menu
         
         cell?.menuInteractionWillDisplay.delegate(on: self, callback: { (self) in
+            print("-----")
             self.tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
         })
         

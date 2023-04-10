@@ -113,6 +113,14 @@ extension RepeatTableViewCell {
             // 因为通过设定特殊的阿拉伯语本地化适配，所以阅读顺序为从右到左。
             contextMenuButton.imageEdgeInsets = .init(top: 0, left: layoutMargins.right, bottom: 0, right: -layoutMargins.right)
         }
+        
+        contextMenuButton.menuWillDisplayTriggered.delegate(on: self) { (self) in
+            self.menuInteractionWillDisplay.callAsFunction()
+        }
+        
+        contextMenuButton.menuWillEndTriggered.delegate(on: self) { (self) in
+            self.menuInteractionWillEnd.callAsFunction()
+        }
     }
     
 }
