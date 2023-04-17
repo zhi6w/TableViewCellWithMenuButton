@@ -60,6 +60,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         var contentConfiguration = cell?.defaultContentConfiguration()
         
         contentConfiguration?.text = "Repeat - \(indexPath.row)"
+        contentConfiguration?.image = UIImage(systemName: "flag.fill")
         cell?.contentConfiguration = contentConfiguration
 
         cell?.detailText = "Never"
@@ -85,11 +86,18 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         cell?.menu = menu
         
         cell?.menuInteractionWillDisplay.delegate(on: self, callback: { (self) in
-            print("-----")
             self.tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
         })
         
         cell?.menuInteractionWillEnd.delegate(on: self, callback: { (self) in
+            self.tableView.deselectRow(at: indexPath, animated: true)
+        })
+        
+        cell?.longPressBegan.delegate(on: self, callback: { (self) in
+            self.tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
+        })
+        
+        cell?.longPressEnded.delegate(on: self, callback: { (self) in
             self.tableView.deselectRow(at: indexPath, animated: true)
         })
                 

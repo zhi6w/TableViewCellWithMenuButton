@@ -31,8 +31,10 @@ class RepeatTableViewCell: UITableViewCell {
         }
     }
 
-    let menuInteractionWillDisplay = Delegate<Void, Void>()
-    let menuInteractionWillEnd = Delegate<Void, Void>()
+    public let menuInteractionWillDisplay = Delegate<Void, Void>()
+    public let menuInteractionWillEnd = Delegate<Void, Void>()
+    public let longPressBegan = Delegate<Void, Void>()
+    public let longPressEnded = Delegate<Void, Void>()
     
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -120,6 +122,14 @@ extension RepeatTableViewCell {
         
         contextMenuButton.menuWillEndTriggered.delegate(on: self) { (self) in
             self.menuInteractionWillEnd.callAsFunction()
+        }
+        
+        contextMenuButton.longPressBeganTriggered.delegate(on: self) { (self) in
+            self.longPressBegan.callAsFunction()
+        }
+        
+        contextMenuButton.longPressEndedTriggered.delegate(on: self) { (self) in
+            self.longPressEnded.callAsFunction()
         }
     }
     

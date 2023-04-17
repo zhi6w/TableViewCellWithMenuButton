@@ -18,6 +18,9 @@ open class ContextMenuAccessoryButton: UIButton {
     public let menuWillDisplayTriggered = Delegate<Void, Void>()
     public let menuWillEndTriggered = Delegate<Void, Void>()
     
+    public let longPressBeganTriggered = Delegate<Void, Void>()
+    public let longPressEndedTriggered = Delegate<Void, Void>()
+    
     private var longPressGestureRecognizer: UILongPressGestureRecognizer?
     
 
@@ -73,8 +76,26 @@ extension ContextMenuAccessoryButton {
 
 extension ContextMenuAccessoryButton: UIGestureRecognizerDelegate {
     
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+                
+        switch gestureRecognizer.state {
+        case .began:
+            // 监听长按按钮开始事件。
+            longPressBeganTriggered.callAsFunction()
+            
+        case .ended:
+            // 监听长按按钮结束事件。
+            longPressEndedTriggered.callAsFunction()
+            
+        default:
+            break
+        }
+        
+        return false
+    }
+    
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-
+                
         // 区分单击与长按手势，仅单击时才触发 menu 菜单。
         return true
     }
