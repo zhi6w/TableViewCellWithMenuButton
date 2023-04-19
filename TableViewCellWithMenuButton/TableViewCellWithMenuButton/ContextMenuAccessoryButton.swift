@@ -50,6 +50,7 @@ extension ContextMenuAccessoryButton {
         longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: nil)
         longPressGestureRecognizer?.delegate = self
         longPressGestureRecognizer?.cancelsTouchesInView = false
+        longPressGestureRecognizer?.minimumPressDuration = 0.15 // 设定较短的时间，在长按时快速触发点击响应产生的“背景选中”（tableView DidSeleted）变化。
 
         addGestureRecognizer(longPressGestureRecognizer!)
     }
@@ -77,7 +78,9 @@ extension ContextMenuAccessoryButton {
 extension ContextMenuAccessoryButton: UIGestureRecognizerDelegate {
     
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-                
+        
+        print(">>>>", gestureRecognizer.state.rawValue)
+                        
         switch gestureRecognizer.state {
         case .began:
             // 监听长按按钮开始事件。
@@ -95,7 +98,7 @@ extension ContextMenuAccessoryButton: UIGestureRecognizerDelegate {
     }
     
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-                
+        
         // 区分单击与长按手势，仅单击时才触发 menu 菜单。
         return true
     }
