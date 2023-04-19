@@ -78,9 +78,7 @@ extension ContextMenuAccessoryButton {
 extension ContextMenuAccessoryButton: UIGestureRecognizerDelegate {
     
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        
-        print(">>>>", gestureRecognizer.state.rawValue)
-                        
+                                
         switch gestureRecognizer.state {
         case .began:
             // 监听长按按钮开始事件。
