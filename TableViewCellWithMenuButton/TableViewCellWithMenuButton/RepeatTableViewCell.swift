@@ -89,7 +89,7 @@ extension RepeatTableViewCell {
         if #unavailable(iOS 15.0) {
             contextMenuButton.titleLabel?.font = .systemFont(ofSize: UIFont.preferredFont(forTextStyle: .headline).pointSize, weight: .regular)
         } else {
-            contextMenuButton.titleLabel?.font = .preferredFont(forTextStyle: .subheadline)
+            contextMenuButton.titleLabel?.font = .preferredFont(forTextStyle: .headline)
         }
 
         contextMenuButton.titleLabel?.adjustsFontForContentSizeCategory = true
@@ -153,9 +153,12 @@ extension RepeatTableViewCell {
             // 超大字体
             contextMenuButton.contentHorizontalAlignment = .left
             
-            let buttonTitleLabelHeight = contextMenuButton.titleLabel?.bounds.height ?? 0
-            let contentVerticalMargin = contentView.bounds.height - buttonTitleLabelHeight * 2 - layoutMargins.top - layoutMargins.bottom
+            let labelHeight = contextMenuButton.titleLabel?.bounds.height ?? 0
+            // buttonTitleLabelHeight * 2 含义：两个 label 在大字体下分别为一行，总共两行。
+            let contentVerticalMargin = contentView.bounds.height - labelHeight * 2 - layoutMargins.top - layoutMargins.bottom
 
+            print(">>>>>>", contentVerticalMargin)
+            
             if #available(iOS 15.0, *) {
                 var configuration = contextMenuButton.configuration
                 configuration?.contentInsets = .init(top: contentVerticalMargin, leading: layoutMargins.left, bottom: -(contextMenuButton.titleLabel?.bounds.height ?? 0), trailing: layoutMargins.right)
