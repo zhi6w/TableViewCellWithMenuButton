@@ -56,15 +56,15 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "\(RepeatTableViewCell.self)", for: indexPath) as? RepeatTableViewCell
-        
+
         var contentConfiguration = cell?.defaultContentConfiguration()
-        
+
         contentConfiguration?.text = "Repeat - \(indexPath.row)"
         contentConfiguration?.image = UIImage(systemName: "flag.fill")
         cell?.contentConfiguration = contentConfiguration
 
         cell?.detailText = "Never"
-                
+
         var defaultActions: [UIMenuElement] = []
         let neverAction = UIAction(title: "Never", state: .on, handler: { _ in })
         let everyDayAction = UIAction(title: "Every Day", handler: { _ in })
@@ -73,30 +73,30 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         let everyMonthAction = UIAction(title: "Every Month", handler: { _ in })
         let everyYearAction = UIAction(title: "Every Year", handler: { _ in })
         defaultActions = [neverAction, everyDayAction, everyWeekAction, every2WeeksAction, everyMonthAction, everyYearAction]
-        
+
         var customActions: [UIMenuElement] = []
         let customAction = UIAction(title: "Custom", state: .off, handler: { _ in })
         customActions = [customAction]
-        
+
         let menu = UIMenu(children: [
             UIMenu(options: .displayInline, children: defaultActions),
             UIMenu(options: .displayInline, children: customActions)
         ])
-        
+
         cell?.menu = menu
-        
+
         cell?.menuInteractionWillDisplay.delegate(on: self, callback: { (self) in
             self.tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
         })
-        
+
         cell?.menuInteractionWillEnd.delegate(on: self, callback: { (self) in
             self.tableView.deselectRow(at: indexPath, animated: true)
         })
-        
+
         cell?.longPressBegan.delegate(on: self, callback: { (self) in
             self.tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
         })
-        
+
         cell?.longPressEnded.delegate(on: self, callback: { (self) in
             self.tableView.deselectRow(at: indexPath, animated: true)
         })

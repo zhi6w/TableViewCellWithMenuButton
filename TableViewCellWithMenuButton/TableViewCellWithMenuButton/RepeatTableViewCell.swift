@@ -38,7 +38,7 @@ class RepeatTableViewCell: UITableViewCell {
     
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: .value2, reuseIdentifier: reuseIdentifier)
+        super.init(style: .value1, reuseIdentifier: reuseIdentifier)
 
         setupInterface()
     }
@@ -58,12 +58,18 @@ class RepeatTableViewCell: UITableViewCell {
 extension RepeatTableViewCell {
     
     private func setupInterface() {
+        setupDefaultContentConfiguration()
+        setupContextMenuButton()
+    }
+    
+    private func setupDefaultContentConfiguration() {
+        /* 默认展示 tableViewCell 原有的 textLabel，根据苹果提供的 textLabel 进行布局，来实现默认的对齐间距。
+           同时屏蔽了外界设定 textLabel、detailTextLabel 文字。
+         */
         var contentConfiguration = defaultContentConfiguration()
         contentConfiguration.text = " "
-
+        
         self.contentConfiguration = contentConfiguration
-
-        setupContextMenuButton()
     }
     
     private func setupContextMenuButton() {
