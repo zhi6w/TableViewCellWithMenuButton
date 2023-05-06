@@ -11,10 +11,13 @@ class ViewController: UIViewController {
     
     private let tableView = UITableView(frame: .zero, style: .insetGrouped)
     
+    private var sections: [Section] = []
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        loadDatas()
         setupInterface()
     }
 
@@ -43,27 +46,42 @@ extension ViewController {
     
 }
 
+extension ViewController {
+    
+    private func loadDatas() {
+        
+        (0..<3).forEach { _ in
+            var items: [Item] = []
+            (0..<6).forEach { _ in
+                let item = Item(text: "Text", secondaryText: "Secondary Text")
+                items.append(item)
+            }
+            
+            let section = Section(items: items)
+            sections.append(section)
+        }
+    }
+    
+}
+
 extension ViewController: UITableViewDataSource, UITableViewDelegate {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+        return sections.count
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 30
+        return sections[section].items.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "\(RepeatTableViewCell.self)", for: indexPath) as? RepeatTableViewCell
-
-        var contentConfiguration = cell?.defaultContentConfiguration()
-
-        contentConfiguration?.text = "Repeat - \(indexPath.row)"
-        contentConfiguration?.image = UIImage(systemName: "flag.fill")
-        cell?.contentConfiguration = contentConfiguration
-
-        cell?.detailText = "Never"
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "\(RepeatTableViewCell.self)", for: indexPath) as? RepeatTableViewCell
+        else {
+            fatalError("Could not dequeue \(RepeatTableViewCell.self) with identifier: \(RepeatTableViewCell.self)")
+        }
+        
+        cell.item = sections[indexPath.section].items[indexPath.row]
 
         var defaultActions: [UIMenuElement] = []
         let neverAction = UIAction(title: "Never", state: .on, handler: { _ in })
@@ -83,25 +101,33 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
             UIMenu(options: .displayInline, children: customActions)
         ])
 
-        cell?.menu = menu
+        cell.menu = menu
 
-        cell?.menuInteractionWillDisplay.delegate(on: self, callback: { (self) in
+        cell.menuInteractionWillDisplay.delegate(on: self, callback: { (self) in
             self.tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
         })
 
-        cell?.menuInteractionWillEnd.delegate(on: self, callback: { (self) in
+        cell.menuInteractionWillEnd.delegate(on: self, callback: { (self) in
             self.tableView.deselectRow(at: indexPath, animated: true)
         })
 
-        cell?.longPressBegan.delegate(on: self, callback: { (self) in
+        cell.longPressBegan.delegate(on: self, callback: { (self) in
             self.tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
         })
 
-        cell?.longPressEnded.delegate(on: self, callback: { (self) in
+        cell.longPressEnded.delegate(on: self, callback: { (self) in
             self.tableView.deselectRow(at: indexPath, animated: true)
         })
                 
-        return cell!
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 60
+    }
+
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return UITableView.automaticDimension
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
