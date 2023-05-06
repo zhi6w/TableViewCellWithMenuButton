@@ -53,7 +53,7 @@ extension ViewController {
         (0..<3).forEach { _ in
             var items: [Item] = []
             (0..<6).forEach { _ in
-                let item = Item(text: "Text", secondaryText: "Secondary Text")
+                let item = Item(text: "TextTextTextTextTextTextTextTextTextText", secondaryText: "Secondary Text")
                 items.append(item)
             }
             
