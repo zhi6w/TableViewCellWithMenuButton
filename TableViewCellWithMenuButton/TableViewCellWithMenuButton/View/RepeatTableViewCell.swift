@@ -38,33 +38,7 @@ class RepeatTableViewCell: UITableViewCell {
     
     var isVerticalLayout = false
     var isHorizontalLayout = false
-    
-    private var compressedSizeLayoutConstraints: [NSLayoutConstraint] = []
-    private var expandedSizeLayoutConstraints: [NSLayoutConstraint] = []
-        
-    /// 展开状态下的视图。
-    let expandedContentView = UIView()
-    
-    var isExpanded = false
-    
-    /// 展开视图的内容高度。
-    private var expandedContentViewHeight: CGFloat {
-        if isExpanded {
-            UIView.animate(withDuration: 0.25) {
-                self.expandedContentView.alpha = 1
-            }
-            
-            return expandedContentView.bounds.height
-        }
-        else {
-            UIView.animate(withDuration: 0.25) {
-                self.expandedContentView.alpha = 0
-            }
-            
-            return 0
-        }
-    }
-    
+
     var text: String? {
         didSet {
             primaryLabel.text = text
@@ -123,13 +97,13 @@ class RepeatTableViewCell: UITableViewCell {
         }
     
         let size = super.systemLayoutSizeFitting(targetSize, withHorizontalFittingPriority: horizontalFittingPriority, verticalFittingPriority: verticalFittingPriority)
-        
+                        
         /* 只有在标准字体下才判断：是否因为水平布局下两个 label 的内容过多，导致水平空间不够，需要切换为垂直布局。
            大字体下默认就已经是垂直布局，所以不需要进行下一步操作。
          */
         let isAccessibilityCategory = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
         if isAccessibilityCategory {
-            return .init(width: size.width, height: size.height + expandedContentViewHeight)
+            return size
         }
 
         // 先切换为单行显示，计算出 label 内文字的真实宽度。
@@ -170,9 +144,7 @@ class RepeatTableViewCell: UITableViewCell {
             
             height = primaryLabelHeight + secondaryLabelHeight + layoutMargins.top + layoutMargins.bottom + verticalSpacing
         }
-        
-        height += expandedContentViewHeight
-
+                
         // 在 tableView 自动布局下，返回正确的高度。
         return CGSize(width: size.width, height: height)
     }
@@ -190,7 +162,6 @@ extension RepeatTableViewCell {
         setupPrimaryLabel()
         setupSecondaryLabel()
         setupDisclosureIndicatorView()
-        setupExpandedView()
         setupContextMenuButton()
         
         setupLayoutConstraints()
@@ -207,7 +178,7 @@ extension RepeatTableViewCell {
         
         primaryLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        // 在垂直状态下，已较低的优先级抗拉伸。保证两个 label 在垂直布局时不发生布局冲突错误。
+        // 在垂直状态下，以较低的优先级抗拉伸。保证两个 label 在垂直布局时不发生布局冲突错误。
         primaryLabel.setContentHuggingPriority(.defaultHigh, for: .vertical)
     }
     
@@ -222,7 +193,7 @@ extension RepeatTableViewCell {
         
         secondaryLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        // 在垂直状态下，已较高的优先级抗拉伸。保证两个 label 在垂直布局时不发生布局冲突错误。
+        // 在垂直状态下，以较高的优先级抗拉伸。保证两个 label 在垂直布局时不发生布局冲突错误。
         secondaryLabel.setContentHuggingPriority(.defaultLow + 1, for: .vertical)
     }
     
@@ -234,13 +205,8 @@ extension RepeatTableViewCell {
         contentView.addSubview(disclosureIndicatorView)
         
         disclosureIndicatorView.translatesAutoresizingMaskIntoConstraints = false
-    }
-    
-    private func setupExpandedView() {
-
-        contentView.addSubview(expandedContentView)
         
-        expandedContentView.translatesAutoresizingMaskIntoConstraints = false
+        disclosureIndicatorView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
     }
     
     private func setupContextMenuButton() {
@@ -286,9 +252,7 @@ extension RepeatTableViewCell {
             // primaryLabel
             primaryLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             primaryLabel.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor),
-            
-            // lessThanOrEqualTo 保证 primaryLabel 不会在收缩动画还未结束时，出现跳动的问题。同时为了防止出现模糊约束的警告。
-            primaryLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor),
+            primaryLabel.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor),
             
             // secondaryLabel
 //            secondaryLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
@@ -296,8 +260,8 @@ extension RepeatTableViewCell {
             secondaryLabel.bottomAnchor.constraint(equalTo: primaryLabel.bottomAnchor),
             
             // disclosureIndicatorView
-            disclosureIndicatorView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
             disclosureIndicatorView.leadingAnchor.constraint(equalTo: secondaryLabel.trailingAnchor, constant: 8),
+            disclosureIndicatorView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
             disclosureIndicatorView.centerYAnchor.constraint(equalTo: secondaryLabel.centerYAnchor)
         ]
   
@@ -312,34 +276,12 @@ extension RepeatTableViewCell {
 //            secondaryLabel.trailingAnchor.constraint(equalTo: primaryLabel.trailingAnchor),
 //            secondaryLabel.firstBaselineAnchor.constraint(equalToSystemSpacingBelow: primaryLabel.lastBaselineAnchor, multiplier: 1.0),
             secondaryLabel.topAnchor.constraint(equalTo: primaryLabel.bottomAnchor, constant: verticalSpacing),
-            
-            // lessThanOrEqualTo 保证 secondaryLabel 不会在收缩动画还未结束时，出现跳动的问题。同时为了防止出现模糊约束的警告。
-            secondaryLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor),
+            secondaryLabel.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor),
             
             // disclosureIndicatorView
-            disclosureIndicatorView.trailingAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.trailingAnchor),
             disclosureIndicatorView.leadingAnchor.constraint(equalTo: secondaryLabel.trailingAnchor, constant: 8),
+            disclosureIndicatorView.trailingAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.trailingAnchor),
             disclosureIndicatorView.centerYAnchor.constraint(equalTo: secondaryLabel.centerYAnchor)
-        ]
-        
-        /* ------------------------------------------------------------ */
-        
-        compressedSizeLayoutConstraints = [
-            expandedContentView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            expandedContentView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            expandedContentView.topAnchor.constraint(equalTo: secondaryLabel.bottomAnchor, constant: verticalSpacing)
-        ]
-        
-        let expandedContentViewBottomAnchorConstraint = expandedContentView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor)
-        
-        // 单独设定 datePicker 的底部约束优先级为低，是为了防止出现模糊约束的警告。同时不会出现展开动画时的跳动问题。
-        expandedContentViewBottomAnchorConstraint.priority = .defaultLow
-        
-        expandedSizeLayoutConstraints = [
-            expandedContentView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            expandedContentView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            expandedContentView.topAnchor.constraint(equalTo: secondaryLabel.bottomAnchor, constant: verticalSpacing),
-            expandedContentViewBottomAnchorConstraint
         ]
     }
     
@@ -357,14 +299,6 @@ extension RepeatTableViewCell {
             
             isHorizontalLayout = true
             isVerticalLayout = false
-        }
-        
-        if isExpanded {
-            NSLayoutConstraint.activate(expandedSizeLayoutConstraints)
-            NSLayoutConstraint.deactivate(compressedSizeLayoutConstraints)
-        } else {
-            NSLayoutConstraint.activate(compressedSizeLayoutConstraints)
-            NSLayoutConstraint.deactivate(expandedSizeLayoutConstraints)
         }
     }
     
