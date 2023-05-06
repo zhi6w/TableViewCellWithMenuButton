@@ -15,11 +15,6 @@ class RepeatTableViewCell: UITableViewCell {
         didSet {
             guard let menu = menu else { return }
             
-            var contentConfiguration = self.contentConfiguration as? UIListContentConfiguration
-            contentConfiguration?.secondaryText = " "
-
-            self.contentConfiguration = contentConfiguration
-            
             contextMenuButton.menu = menu
             contextMenuButton.showsMenuAsPrimaryAction = true
         }
