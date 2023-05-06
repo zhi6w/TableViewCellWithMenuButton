@@ -189,16 +189,12 @@ extension RepeatTableViewCell {
         secondaryButton.setImage(UIImage(systemName: "chevron.up.chevron.down", withConfiguration: UIImage.SymbolConfiguration(scale: .small))?.withTintColor(.secondaryLabel, renderingMode: .alwaysOriginal), for: .normal)
         secondaryButton.contentHorizontalAlignment = .trailing
 
-        if #available(iOS 15.0, *) {
-            var configuration = secondaryButton.configuration ?? UIButton.Configuration.plain()
-            configuration.imagePlacement = .trailing
-            configuration.imagePadding = 8
-            configuration.contentInsets.trailing = 0
-            
-            secondaryButton.configuration = configuration
-        } else {
-            
-        }
+        var configuration = secondaryButton.configuration ?? UIButton.Configuration.plain()
+        configuration.imagePlacement = .trailing
+        configuration.imagePadding = 8
+        configuration.contentInsets.trailing = 0
+        
+        secondaryButton.configuration = configuration
 
         contentView.addSubview(secondaryButton)
         
@@ -218,6 +214,10 @@ extension RepeatTableViewCell {
     }
     
     private func setupContextMenuButton() {
+        
+        // 将 contextMenuButton 文字设定为一个空格，方便 menu 弹出菜单的定位。
+        contextMenuButton.setTitle(" ", for: .normal)
+        contextMenuButton.contentHorizontalAlignment = .trailing
 
         contextMenuButton.menuWillDisplayTriggered.delegate(on: self) { (self) in
             self.menuInteractionWillDisplay.callAsFunction()
@@ -306,16 +306,20 @@ extension RepeatTableViewCell {
         
         secondaryButton.contentHorizontalAlignment = .trailing
 
-        if #available(iOS 15.0, *) {
-            var configuration = secondaryButton.configuration ?? UIButton.Configuration.plain()
-            configuration.imagePlacement = .trailing
-            configuration.imagePadding = 8
-            configuration.contentInsets.trailing = 0
-            
-            secondaryButton.configuration = configuration
-        } else {
-
-        }
+        var configuration = secondaryButton.configuration ?? UIButton.Configuration.plain()
+        configuration.imagePlacement = .trailing
+        configuration.imagePadding = 8
+        configuration.contentInsets.trailing = 0
+        
+        secondaryButton.configuration = configuration
+        
+        /* ---------- */
+        
+        contextMenuButton.contentHorizontalAlignment = .trailing
+        
+        var contextMenuButtonConfiguration = contextMenuButton.configuration ?? UIButton.Configuration.plain()
+        contextMenuButtonConfiguration.contentInsets.trailing = layoutMargins.right
+        contextMenuButton.configuration = contextMenuButtonConfiguration
     }
     
     private func setupVerticalLayoutConstraints() {
@@ -325,16 +329,20 @@ extension RepeatTableViewCell {
         
         secondaryButton.contentHorizontalAlignment = .leading
 
-        if #available(iOS 15.0, *) {
-            var configuration = secondaryButton.configuration ?? UIButton.Configuration.plain()
-            configuration.imagePlacement = .trailing
-            configuration.imagePadding = 8
-            configuration.contentInsets.leading = 0
-            
-            secondaryButton.configuration = configuration
-        } else {
-
-        }
+        var configuration = secondaryButton.configuration ?? UIButton.Configuration.plain()
+        configuration.imagePlacement = .trailing
+        configuration.imagePadding = 8
+        configuration.contentInsets.leading = 0
+        
+        secondaryButton.configuration = configuration
+        
+        /* ---------- */
+        
+        contextMenuButton.contentHorizontalAlignment = .leading
+        
+        var contextMenuButtonConfiguration = contextMenuButton.configuration ?? UIButton.Configuration.plain()
+        contextMenuButtonConfiguration.contentInsets.leading = layoutMargins.left
+        contextMenuButton.configuration = contextMenuButtonConfiguration
     }
     
     /// 计算 label 的真实高度。
