@@ -33,25 +33,58 @@ extension ViewController {
                 let item = Item(text: "Text", secondaryText: "Secondary Text")
                 
                 /* ----- menu ----- */
-                var defaultActions: [UIMenuElement] = []
-                let neverAction = UIAction(title: "Never", state: .on, handler: { _ in })
-                let everyDayAction = UIAction(title: "Every Day", handler: { _ in })
-                let everyWeekAction = UIAction(title: "Every Week", handler: { _ in })
-                let every2WeeksAction = UIAction(title: "Every 2 Weeks", handler: { _ in })
-                let everyMonthAction = UIAction(title: "Every Month", handler: { _ in })
-                let everyYearAction = UIAction(title: "Every Year", handler: { _ in })
+                var menu: UIMenu!
+                
+                var defaultActions: [UIAction] = []
+                let neverAction = UIAction(title: RepeatOption.never.rawValue, handler: { _ in
+                    self.updateMenu(menu, withTitle: RepeatOption.never.rawValue)
+                    item.menu = menu
+                })
+                
+                let everyDayAction = UIAction(title: RepeatOption.everyDay.rawValue, handler: { _ in
+                    self.updateMenu(menu, withTitle: RepeatOption.everyDay.rawValue)
+                    item.menu = menu
+                })
+                
+                let everyWeekAction = UIAction(title: RepeatOption.everyWeek.rawValue, handler: { _ in
+                    self.updateMenu(menu, withTitle: RepeatOption.everyWeek.rawValue)
+                    item.menu = menu
+                })
+                
+                let every2WeeksAction = UIAction(title: RepeatOption.every2Weeks.rawValue) { _ in
+                    self.updateMenu(menu, withTitle: RepeatOption.every2Weeks.rawValue)
+                    item.menu = menu
+                }
+                
+                let everyMonthAction = UIAction(title: RepeatOption.everyMonth.rawValue, handler: { _ in
+                    self.updateMenu(menu, withTitle: RepeatOption.everyMonth.rawValue)
+                    item.menu = menu
+                })
+                
+                let everyYearAction = UIAction(title: RepeatOption.everyYear.rawValue, handler: { _ in
+                    self.updateMenu(menu, withTitle: RepeatOption.everyYear.rawValue)
+                    item.menu = menu
+                })
+                
                 defaultActions = [neverAction, everyDayAction, everyWeekAction, every2WeeksAction, everyMonthAction, everyYearAction]
-
-                var customActions: [UIMenuElement] = []
-                let customAction = UIAction(title: "Custom", state: .off, handler: { _ in })
+                
+                // ----------
+                
+                var customActions: [UIAction] = []
+                let customAction = UIAction(title: RepeatOption.custom.rawValue) { _ in
+                    self.updateMenu(menu, withTitle: RepeatOption.custom.rawValue)
+                    item.menu = menu
+                }
+                
                 customActions = [customAction]
-
-                let menu = UIMenu(children: [
-                    UIMenu(options: .displayInline, children: defaultActions),
-                    UIMenu(options: .displayInline, children: customActions)
+                
+                menu = UIMenu(children: [
+                    UIMenu(identifier: .init(rawValue: "available"), options: .displayInline, children: defaultActions),
+                    UIMenu(identifier: .init(rawValue: "custom"), options: .displayInline, children: customActions)
                 ])
                 
                 item.menu = menu
+                
                 /* ---------- */
                 
                 items.append(item)
@@ -145,6 +178,43 @@ extension ViewController: UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
         
         print("Did Select Row At \(indexPath)")
+    }
+    
+}
+
+extension ViewController {
+    
+    private func updateMenu(_ menu: UIMenu, withTitle title: String) {
+        let availableMenu = menu.children.filter { ($0 as? UIMenu)?.identifier == .init(rawValue: "available") }.first as? UIMenu
+        let newAvailableActions = updateAction(with: availableMenu, and: title)
+        let newAvailableMenu = availableMenu?.replacingChildren(newAvailableActions ?? [])
+
+        /* ---------- */
+        
+        let customMenu = menu.children.filter { ($0 as? UIMenu)?.identifier == .init(rawValue: "custom") }.first as? UIMenu
+        let newCustomActions = updateAction(with: customMenu, and: title)
+        let newCustomMenu = customMenu?.replacingChildren(newCustomActions ?? [])
+        
+        guard let newAvailableMenu = newAvailableMenu, let newCustomMenu = newCustomMenu else { return }
+        
+        menu.replacingChildren([newAvailableMenu, newCustomMenu])
+    }
+    
+    private func updateAction(with menu: UIMenu?, and title: String) -> [UIAction]? {
+        
+        let actions = menu?.children as? [UIAction]
+        let newActions = actions?.compactMap({ action in
+            if action.title == title {
+                action.state = .on
+                return action
+            }
+            else {
+                action.state = .off
+                return action
+            }
+        })
+        
+        return newActions
     }
     
 }

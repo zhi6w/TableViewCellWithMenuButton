@@ -22,6 +22,7 @@
 		D9508C1D2A061C3400032390 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9508C1C2A061C3400032390 /* Item.swift */; };
 		D9508C1F2A061C3D00032390 /* Section.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9508C1E2A061C3D00032390 /* Section.swift */; };
 		D9508C2C2A0799EA00032390 /* RepeatTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9508C2B2A0799EA00032390 /* RepeatTableViewCell.swift */; };
+		D9508C312A07ECC400032390 /* RepeatOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9508C302A07ECC400032390 /* RepeatOption.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,6 +62,7 @@
 		D9508C1C2A061C3400032390 /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
 		D9508C1E2A061C3D00032390 /* Section.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Section.swift; sourceTree = "<group>"; };
 		D9508C2B2A0799EA00032390 /* RepeatTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepeatTableViewCell.swift; sourceTree = "<group>"; };
+		D9508C302A07ECC400032390 /* RepeatOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepeatOption.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -164,6 +166,7 @@
 				D9508C1E2A061C3D00032390 /* Section.swift */,
 				D9508C1C2A061C3400032390 /* Item.swift */,
 				D91D43FB29E401CD0077A6BB /* Delegate.swift */,
+				D9508C302A07ECC400032390 /* RepeatOption.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -311,6 +314,7 @@
 				D91D43FE29E402350077A6BB /* RepeatBasicTableViewCell.swift in Sources */,
 				D91D43CD29E3FFDA0077A6BB /* ViewController.swift in Sources */,
 				D91D43FC29E401CD0077A6BB /* Delegate.swift in Sources */,
+				D9508C312A07ECC400032390 /* RepeatOption.swift in Sources */,
 				D91D43C929E3FFDA0077A6BB /* AppDelegate.swift in Sources */,
 				D9508C1D2A061C3400032390 /* Item.swift in Sources */,
 				D9508C1F2A061C3D00032390 /* Section.swift in Sources */,
