@@ -13,11 +13,11 @@ class ViewController: UIViewController {
     
     private var sections: [Section] = []
     
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        loadDatas()
+        loadData()
         setupInterface()
     }
 
@@ -25,8 +25,53 @@ class ViewController: UIViewController {
 
 extension ViewController {
     
-    private func setupInterface() {
+    private func loadData() {
+        
+        (0..<3).forEach { _ in
+            var items: [Item] = []
+            (0..<6).forEach { _ in
+                let item = Item(text: "Text", secondaryText: "Secondary Text")
                 
+                /* ----- menu ----- */
+                var defaultActions: [UIMenuElement] = []
+                let neverAction = UIAction(title: "Never", state: .on, handler: { _ in })
+                let everyDayAction = UIAction(title: "Every Day", handler: { _ in })
+                let everyWeekAction = UIAction(title: "Every Week", handler: { _ in })
+                let every2WeeksAction = UIAction(title: "Every 2 Weeks", handler: { _ in })
+                let everyMonthAction = UIAction(title: "Every Month", handler: { _ in })
+                let everyYearAction = UIAction(title: "Every Year", handler: { _ in })
+                defaultActions = [neverAction, everyDayAction, everyWeekAction, every2WeeksAction, everyMonthAction, everyYearAction]
+
+                var customActions: [UIMenuElement] = []
+                let customAction = UIAction(title: "Custom", state: .off, handler: { _ in })
+                customActions = [customAction]
+
+                let menu = UIMenu(children: [
+                    UIMenu(options: .displayInline, children: defaultActions),
+                    UIMenu(options: .displayInline, children: customActions)
+                ])
+                
+                item.menu = menu
+                /* ---------- */
+                
+                items.append(item)
+            }
+            
+            let section = Section(items: items)
+            sections.append(section)
+        }
+    }
+    
+}
+
+extension ViewController {
+    
+    private func setupInterface() {
+        setupTableView()
+    }
+    
+    private func setupTableView() {
+        
         tableView.register(RepeatTableViewCell.self, forCellReuseIdentifier: "\(RepeatTableViewCell.self)")
 
         tableView.dataSource = self
@@ -46,25 +91,7 @@ extension ViewController {
     
 }
 
-extension ViewController {
-    
-    private func loadDatas() {
-        
-        (0..<3).forEach { _ in
-            var items: [Item] = []
-            (0..<6).forEach { _ in
-                let item = Item(text: "Text", secondaryText: "Secondary Text")
-                items.append(item)
-            }
-            
-            let section = Section(items: items)
-            sections.append(section)
-        }
-    }
-    
-}
-
-extension ViewController: UITableViewDataSource, UITableViewDelegate {
+extension ViewController: UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return sections.count
@@ -82,26 +109,6 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         }
         
         cell.item = sections[indexPath.section].items[indexPath.row]
-
-        var defaultActions: [UIMenuElement] = []
-        let neverAction = UIAction(title: "Never", state: .on, handler: { _ in })
-        let everyDayAction = UIAction(title: "Every Day", handler: { _ in })
-        let everyWeekAction = UIAction(title: "Every Week", handler: { _ in })
-        let every2WeeksAction = UIAction(title: "Every 2 Weeks", handler: { _ in })
-        let everyMonthAction = UIAction(title: "Every Month", handler: { _ in })
-        let everyYearAction = UIAction(title: "Every Year", handler: { _ in })
-        defaultActions = [neverAction, everyDayAction, everyWeekAction, every2WeeksAction, everyMonthAction, everyYearAction]
-
-        var customActions: [UIMenuElement] = []
-        let customAction = UIAction(title: "Custom", state: .off, handler: { _ in })
-        customActions = [customAction]
-
-        let menu = UIMenu(children: [
-            UIMenu(options: .displayInline, children: defaultActions),
-            UIMenu(options: .displayInline, children: customActions)
-        ])
-
-        cell.menu = menu
 
         cell.menuInteractionWillDisplay.delegate(on: self, callback: { (self) in
             self.tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
@@ -121,6 +128,10 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
                 
         return cell
     }
+  
+}
+
+extension ViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
         return 60
@@ -133,7 +144,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        print("did selected")
+        print("Did Select Row At \(indexPath)")
     }
     
 }

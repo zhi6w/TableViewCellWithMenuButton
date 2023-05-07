@@ -13,13 +13,13 @@ class Item: NSObject {
     
     var secondaryText: String?
     
-    var isExpanded = false
-
+    var menu: UIMenu?
     
-    init(text: String? = nil, secondaryText: String? = nil, isExpanded: Bool = false) {
+    
+    init(text: String? = nil, secondaryText: String? = nil, menu: UIMenu? = nil, isExpanded: Bool = false) {
         self.text = text
         self.secondaryText = secondaryText
-        self.isExpanded = isExpanded
+        self.menu = menu
     }
     
 }
