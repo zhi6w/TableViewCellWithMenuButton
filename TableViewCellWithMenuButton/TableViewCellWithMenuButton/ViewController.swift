@@ -36,7 +36,7 @@ extension ViewController {
                 var menu: UIMenu!
                 
                 var defaultActions: [UIAction] = []
-                let neverAction = UIAction(title: RepeatOption.never.rawValue, handler: { _ in
+                let neverAction = UIAction(title: RepeatOption.never.rawValue, state: .on, handler: { _ in
                     self.updateMenu(menu, withTitle: RepeatOption.never.rawValue)
                     item.menu = menu
                 })
@@ -149,6 +149,9 @@ extension ViewController: UITableViewDataSource {
 
         cell.menuInteractionWillEnd.delegate(on: self, callback: { (self) in
             self.tableView.deselectRow(at: indexPath, animated: true)
+            
+            // 刷新当前 cell，更新 menu 数据，保证 menu 的关闭动画不会被打断。
+            self.tableView.reloadRows(at: [indexPath], with: .automatic)
         })
 
         cell.longPressBegan.delegate(on: self, callback: { (self) in
