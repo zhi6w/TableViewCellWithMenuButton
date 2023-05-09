@@ -172,6 +172,9 @@ extension RepeatBasicTableViewCell {
     }
 
     private func setupSecondaryButton() {
+        
+        secondaryButton.isUserInteractionEnabled = false
+        
         // 使用 button 来进行展示，为了明确自动布局，防止出现 lessThanEqual 的布局形式导致的高度计算错误（例如：旋转屏幕时）。
         secondaryButton.setTitleColor(.secondaryLabel, for: .normal)
         secondaryButton.titleLabel?.font = .systemFont(ofSize: UIFont.preferredFont(forTextStyle: .headline).pointSize, weight: .regular)
