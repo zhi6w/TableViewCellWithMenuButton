@@ -70,7 +70,7 @@ class RepeatBasicTableViewCell: UITableViewCell {
     var image: UIImage? {
         didSet {
             leftImageView.image = image
-            
+
             if traitCollection.preferredContentSizeCategory >= .accessibilityMedium {
                 // 大字体
                 leftImageView.layoutIfNeeded()
@@ -112,9 +112,10 @@ class RepeatBasicTableViewCell: UITableViewCell {
         }
     
         let size = super.systemLayoutSizeFitting(targetSize, withHorizontalFittingPriority: horizontalFittingPriority, verticalFittingPriority: verticalFittingPriority)
-
-        /* 只有在标准字体下才判断：是否因为水平布局下两个 label 的内容过多，导致水平空间不够，需要切换为垂直布局。
-           大字体下默认就已经是垂直布局，所以不需要进行下一步操作。
+        
+        /*
+         只有在标准字体下才判断：是否因为水平布局下两个 label 的内容过多，导致水平空间不够，需要切换为垂直布局。
+         大字体下默认就已经是垂直布局，所以不需要进行下一步操作。
          */
         let isAccessibilityCategory = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
         if isAccessibilityCategory {
@@ -122,7 +123,7 @@ class RepeatBasicTableViewCell: UITableViewCell {
         }
 
         let height = layoutContentView()
-                
+                        
         // 在 tableView 自动布局下，返回正确的高度。
         return CGSize(width: size.width, height: height)
     }
@@ -343,6 +344,10 @@ extension RepeatBasicTableViewCell {
 
         updateSecondaryButtonContentHorizontalAlignment(.trailing)
         updateContextMenuButtonContentHorizontalAlignment(.trailing)
+        
+        var configuration = contextMenuButton.configuration ?? UIButton.Configuration.plain()
+        configuration.contentInsets.leading = 0
+        contextMenuButton.configuration = configuration
     }
     
     /// 标准字体状态的垂直布局。
@@ -353,6 +358,11 @@ extension RepeatBasicTableViewCell {
         
         updateSecondaryButtonContentHorizontalAlignment(.leading)
         updateContextMenuButtonContentHorizontalAlignment(.leading)
+        
+        leftImageView.layoutIfNeeded()
+        var configuration = contextMenuButton.configuration ?? UIButton.Configuration.plain()
+        configuration.contentInsets.leading = layoutMargins.left + ((leftImageView.bounds.width == 0) ? 0 : leftImageView.bounds.width + primaryLabelFirstLineHeadIndent)
+        contextMenuButton.configuration = configuration
     }
     
     /// 大字体状态的垂直布局。
@@ -363,6 +373,10 @@ extension RepeatBasicTableViewCell {
         
         updateSecondaryButtonContentHorizontalAlignment(.leading)
         updateContextMenuButtonContentHorizontalAlignment(.leading)
+        
+        var configuration = contextMenuButton.configuration ?? UIButton.Configuration.plain()
+        configuration.contentInsets.leading = 0
+        contextMenuButton.configuration = configuration
     }
     
     /// 计算 label 的真实高度。
@@ -425,6 +439,7 @@ extension RepeatBasicTableViewCell {
         } else {
             // 垂直布局
             setupVerticalLayoutConstraints()
+
             isHorizontalLayout = false
             isVerticalLayout = true
             
@@ -438,6 +453,8 @@ extension RepeatBasicTableViewCell {
     ///
     /// 水平对齐的位置决定了弹出的 menu 锚点位置。
     private func updateContextMenuButtonContentHorizontalAlignment(_ alignment: UIControl.ContentHorizontalAlignment) {
+
+        contextMenuButton.contentVerticalAlignment = .bottom
                 
         var contextMenuButtonConfiguration = contextMenuButton.configuration ?? UIButton.Configuration.plain()
         

@@ -15,6 +15,9 @@ open class ContextMenuAccessoryButton: UIButton {
         }
     }
     
+    /// 菜单位置偏移量。
+    open var menuPositionOffset: CGPoint = .zero
+    
     public let menuWillDisplayTriggered = Delegate<Void, Void>()
     public let menuWillEndTriggered = Delegate<Void, Void>()
     
@@ -59,6 +62,13 @@ extension ContextMenuAccessoryButton {
 
 extension ContextMenuAccessoryButton {
     
+    open override func menuAttachmentPoint(for configuration: UIContextMenuConfiguration) -> CGPoint {
+        // 改变 menu 的弹出位置
+        let position = super.menuAttachmentPoint(for: configuration)
+        
+        return .init(x: position.x + menuPositionOffset.x, y: position.y + menuPositionOffset.y)
+    }
+    
     open override func contextMenuInteraction(_ interaction: UIContextMenuInteraction, willDisplayMenuFor configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionAnimating?) {
         super.contextMenuInteraction(interaction, willDisplayMenuFor: configuration, animator: animator)
         
@@ -72,7 +82,7 @@ extension ContextMenuAccessoryButton {
         // 监听按钮的 menu 关闭。
         menuWillEndTriggered.callAsFunction()
     }
-    
+
 }
 
 extension ContextMenuAccessoryButton: UIGestureRecognizerDelegate {

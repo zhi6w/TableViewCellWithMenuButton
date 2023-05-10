@@ -30,7 +30,7 @@ extension ViewController {
         (0..<3).forEach { _ in
             var items: [Item] = []
             (0..<6).forEach { _ in
-                let item = Item(text: "Text", secondaryText: "Secondary Text")
+                let item = Item(text: "Text is displayed in multiple lines", secondaryText: "Secondary Text")
                 item.image = UIImage(systemName: "flag.fill", withConfiguration: UIImage.SymbolConfiguration(textStyle: .headline, scale: .small))
                 
                 /* ----- menu ----- */
