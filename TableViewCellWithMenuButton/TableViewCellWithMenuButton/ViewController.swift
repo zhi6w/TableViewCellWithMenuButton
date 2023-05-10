@@ -31,6 +31,7 @@ extension ViewController {
             var items: [Item] = []
             (0..<6).forEach { _ in
                 let item = Item(text: "Text", secondaryText: "Secondary Text")
+                item.image = UIImage(systemName: "flag.fill", withConfiguration: UIImage.SymbolConfiguration(textStyle: .headline, scale: .small))
                 
                 /* ----- menu ----- */
                 var menu: UIMenu!

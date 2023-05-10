@@ -27,33 +27,57 @@ class RepeatBasicTableViewCell: UITableViewCell {
     public let longPressBegan = Delegate<Void, Void>()
     public let longPressEnded = Delegate<Void, Void>()
     
+    private let leftImageView = UIImageView()
     private let primaryLabel = UILabel()
     private let secondaryButton = UIButton()
+    
+    /// primaryLabel 首行文字前部的缩进。
+    let primaryLabelFirstLineHeadIndent: CGFloat = 16
     
     /// 控件垂直间距。
     private let verticalSpacing: CGFloat = 4
     
+    private let defaultLayoutMarginsTop: CGFloat = 11
+    
     private var horizontalLayoutConstraints: [NSLayoutConstraint] = []
     private var verticalLayoutConstraints: [NSLayoutConstraint] = []
+    private var verticalAccessibilityLayoutConstraints: [NSLayoutConstraint] = []
     
     var isVerticalLayout = false
     var isHorizontalLayout = false
+    
+    /// 压缩状态下的视图。
+    let compressedContentView = UIView()
 
     var text: String? {
         didSet {
-            primaryLabel.text = text
-
-//            let paragraphStyle = NSMutableParagraphStyle()
-//            paragraphStyle.firstLineHeadIndent = 10 // 第一行的前方缩进空白。
-////            paragraphStyle.headIndent = 10 // 除了第一行之外其他行的前方缩进空白。
-//
-//            primaryLabel.attributedText = NSAttributedString(string: text ?? " ", attributes: [NSAttributedString.Key.paragraphStyle: paragraphStyle])
+            if traitCollection.preferredContentSizeCategory >= .accessibilityMedium {
+                // 大字体
+                leftImageView.layoutIfNeeded()
+                indentLabel(primaryLabel, text: text, firstLineHeadIndent: leftImageView.bounds.width + primaryLabelFirstLineHeadIndent)
+            } else {
+                indentLabel(primaryLabel, text: text, firstLineHeadIndent: 0)
+            }
         }
     }
 
     var secondaryText: String? {
         didSet {
             secondaryButton.setTitle(secondaryText, for: .normal)
+        }
+    }
+    
+    var image: UIImage? {
+        didSet {
+            leftImageView.image = image
+            
+            if traitCollection.preferredContentSizeCategory >= .accessibilityMedium {
+                // 大字体
+                leftImageView.layoutIfNeeded()
+                indentLabel(primaryLabel, text: text, firstLineHeadIndent: leftImageView.bounds.width + primaryLabelFirstLineHeadIndent)
+            } else {
+                indentLabel(primaryLabel, text: text, firstLineHeadIndent: 0)
+            }
         }
     }
  
@@ -97,43 +121,7 @@ class RepeatBasicTableViewCell: UITableViewCell {
             return size
         }
 
-        // 先切换为单行显示，计算出 label 内文字的真实宽度。
-        primaryLabel.numberOfLines = 1
-        primaryLabel.sizeToFit()
-        primaryLabel.numberOfLines = 0 // 然后再恢复为多行显示。
-
-        // 计算按钮的宽高。
-        secondaryButton.layoutIfNeeded()
-        let secondaryButtonWidth = secondaryButton.bounds.width
-        let secondaryButtonHeight = secondaryButton.titleLabel?.bounds.height ?? 0
-
-        // 水平布局时，primaryLabel 与 secondaryButton 显示区域的宽度。
-        let viewsAreaWidth = contentView.bounds.width - layoutMargins.left - layoutMargins.right
-
-        // primaryLabel 在单行显示下，内容的宽度。
-        let viewsWidth = primaryLabel.bounds.width + secondaryButtonWidth
-
-        // 计算多行显示下，primaryLabel 的高度。
-        let primaryLabelHeight = heightFor(label: primaryLabel, at: viewsAreaWidth)
-        
-        var height: CGFloat = 0
-
-        // 当两个控件的水平单行宽度超出两个控件的显示区域宽度时，改为垂直布局；否则为水平布局。
-        if viewsWidth < viewsAreaWidth {
-            // 水平布局
-            setupHorizontalLayoutConstraints()
-            isHorizontalLayout = true
-            isVerticalLayout = false
-            
-            height = (primaryLabelHeight == 0 ? secondaryButtonHeight : primaryLabelHeight) + layoutMargins.top + layoutMargins.bottom
-        } else {
-            // 垂直布局
-            setupVerticalLayoutConstraints()
-            isHorizontalLayout = false
-            isVerticalLayout = true
-            
-            height = primaryLabelHeight + secondaryButtonHeight + layoutMargins.top + layoutMargins.bottom + verticalSpacing
-        }
+        let height = layoutContentView()
                 
         // 在 tableView 自动布局下，返回正确的高度。
         return CGSize(width: size.width, height: height)
@@ -149,6 +137,8 @@ extension RepeatBasicTableViewCell {
         
         NotificationCenter.default.addObserver(self, selector: #selector(contentSizeCategoryDidChange(_:)), name: UIContentSizeCategory.didChangeNotification, object: nil)
         
+        setupCompressedContentView()
+        setupLeftImageView()
         setupPrimaryLabel()
         setupSecondaryButton()
         setupContextMenuButton()
@@ -157,18 +147,42 @@ extension RepeatBasicTableViewCell {
         updateLayoutConstraints()
     }
     
+    private func setupCompressedContentView() {
+                
+        contentView.addSubview(compressedContentView)
+        
+        compressedContentView.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            compressedContentView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
+            compressedContentView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
+            compressedContentView.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor)
+        ])
+    }
+    
+    private func setupLeftImageView() {
+        
+        leftImageView.adjustsImageSizeForAccessibilityContentSizeCategory = true
+        
+        leftImageView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        
+        compressedContentView.addSubview(leftImageView)
+        
+        leftImageView.translatesAutoresizingMaskIntoConstraints = false
+    }
+    
     private func setupPrimaryLabel() {
 //        primaryLabel.text = " "
         primaryLabel.adjustsFontForContentSizeCategory = true
         primaryLabel.numberOfLines = 0
         primaryLabel.font = .systemFont(ofSize: UIFont.preferredFont(forTextStyle: .headline).pointSize, weight: .regular)
         
-        contentView.addSubview(primaryLabel)
+        compressedContentView.addSubview(primaryLabel)
         
         primaryLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        // 在垂直状态下，以较低的优先级抗拉伸。保证两个 label 在垂直布局时不发生布局冲突错误。
-        primaryLabel.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        // 在垂直状态下，以较低的优先级抗拉伸。保证 label 与 secondaryButton 在垂直布局时不发生布局冲突错误。
+        primaryLabel.setContentHuggingPriority(.defaultLow, for: .vertical)
     }
 
     private func setupSecondaryButton() {
@@ -184,7 +198,7 @@ extension RepeatBasicTableViewCell {
 
         updateSecondaryButtonContentHorizontalAlignment(.trailing)
 
-        contentView.addSubview(secondaryButton)
+        compressedContentView.addSubview(secondaryButton)
         
         secondaryButton.translatesAutoresizingMaskIntoConstraints = false
     }
@@ -194,7 +208,7 @@ extension RepeatBasicTableViewCell {
         disclosureIndicatorView.adjustsImageSizeForAccessibilityContentSizeCategory = true
         disclosureIndicatorView.image = UIImage(systemName: "chevron.up.chevron.down", withConfiguration: UIImage.SymbolConfiguration(textStyle: .subheadline, scale: .small))?.withTintColor(.secondaryLabel, renderingMode: .alwaysOriginal) // 使用 UIImage.SymbolConfiguration(textStyle:) 保证图片能适配可访问性文本大小设置。
 
-        contentView.addSubview(disclosureIndicatorView)
+        compressedContentView.addSubview(disclosureIndicatorView)
         
         disclosureIndicatorView.translatesAutoresizingMaskIntoConstraints = false
         
@@ -245,28 +259,65 @@ extension RepeatBasicTableViewCell {
     private func setupLayoutConstraints() {
                 
         horizontalLayoutConstraints = [
-            // primaryLabel
-            primaryLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
-            primaryLabel.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor),
-            primaryLabel.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor),
+            // Left Image View
+            leftImageView.leadingAnchor.constraint(equalTo: compressedContentView.leadingAnchor),
+            leftImageView.centerYAnchor.constraint(equalTo: primaryLabel.centerYAnchor),
             
-            // secondaryButton
-            secondaryButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
+            // Primary Label
+            primaryLabel.leadingAnchor.constraint(equalTo: leftImageView.trailingAnchor, constant: primaryLabelFirstLineHeadIndent),
+            primaryLabel.topAnchor.constraint(equalTo: compressedContentView.topAnchor),
+            primaryLabel.bottomAnchor.constraint(equalTo: compressedContentView.bottomAnchor),
+            
+            // Secondary Button
+            secondaryButton.trailingAnchor.constraint(equalTo: compressedContentView.trailingAnchor),
             secondaryButton.topAnchor.constraint(equalTo: primaryLabel.topAnchor),
-            secondaryButton.bottomAnchor.constraint(equalTo: primaryLabel.bottomAnchor)
+            secondaryButton.bottomAnchor.constraint(equalTo: primaryLabel.bottomAnchor),
+            
+            // Compressed Content View
+            compressedContentView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor)
         ]
   
         verticalLayoutConstraints = [
-            // primaryLabel
-            primaryLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
-            primaryLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
-            primaryLabel.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor),
+            // Left Image View
+            leftImageView.leadingAnchor.constraint(equalTo: compressedContentView.leadingAnchor),
+            leftImageView.centerYAnchor.constraint(equalTo: compressedContentView.centerYAnchor),
             
-            // secondaryButton
+            // Primary Label
+            primaryLabel.leadingAnchor.constraint(equalTo: leftImageView.trailingAnchor, constant: primaryLabelFirstLineHeadIndent),
+            primaryLabel.trailingAnchor.constraint(equalTo: compressedContentView.trailingAnchor),
+            primaryLabel.topAnchor.constraint(equalTo: compressedContentView.topAnchor),
+            
+            // Secondary Button
             secondaryButton.leadingAnchor.constraint(equalTo: primaryLabel.leadingAnchor),
             secondaryButton.trailingAnchor.constraint(equalTo: primaryLabel.trailingAnchor),
             secondaryButton.topAnchor.constraint(equalTo: primaryLabel.bottomAnchor, constant: verticalSpacing),
-            secondaryButton.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor)
+            secondaryButton.bottomAnchor.constraint(equalTo: compressedContentView.bottomAnchor),
+            
+            // Compressed Content View
+            compressedContentView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor)
+        ]
+        
+        // 大字体下的垂直布局。
+        verticalAccessibilityLayoutConstraints = [
+            // Left Image View
+            leftImageView.leadingAnchor.constraint(equalTo: compressedContentView.leadingAnchor),
+            leftImageView.topAnchor.constraint(equalTo: compressedContentView.topAnchor),
+            
+            // Primary Label
+            primaryLabel.leadingAnchor.constraint(equalTo: compressedContentView.leadingAnchor),
+            primaryLabel.trailingAnchor.constraint(equalTo: compressedContentView.trailingAnchor),
+            primaryLabel.topAnchor.constraint(equalTo: compressedContentView.topAnchor),
+                        
+            // Secondary Label
+            secondaryButton.leadingAnchor.constraint(equalTo: primaryLabel.leadingAnchor),
+            secondaryButton.trailingAnchor.constraint(equalTo: primaryLabel.trailingAnchor),
+            secondaryButton.topAnchor.constraint(equalTo: primaryLabel.bottomAnchor, constant: verticalSpacing),
+            
+            // lessThanOrEqualTo 保证 secondaryLabel 不会在收缩动画还未结束时，出现跳动的问题。同时为了防止出现模糊约束的警告。
+            secondaryButton.bottomAnchor.constraint(equalTo: compressedContentView.bottomAnchor),
+            
+            // Compressed Content View
+            compressedContentView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor)
         ]
     }
     
@@ -274,32 +325,41 @@ extension RepeatBasicTableViewCell {
         
         if traitCollection.preferredContentSizeCategory.isAccessibilityCategory {
             // 大字体下的布局更新
-            setupVerticalLayoutConstraints()
+            setupVerticalAccessibilityLayoutConstraints()
             
             isVerticalLayout = true
             isHorizontalLayout = false
         } else {
             // 标准字体下的布局更新。
-            setupHorizontalLayoutConstraints()
-            
-            isHorizontalLayout = true
-            isVerticalLayout = false
+            layoutContentView()
         }
     }
     
+    /// 标准字体状态的水平布局。
     private func setupHorizontalLayoutConstraints() {
-        // 水平布局更新。
         NSLayoutConstraint.deactivate(verticalLayoutConstraints)
+        NSLayoutConstraint.deactivate(verticalAccessibilityLayoutConstraints)
         NSLayoutConstraint.activate(horizontalLayoutConstraints)
 
         updateSecondaryButtonContentHorizontalAlignment(.trailing)
         updateContextMenuButtonContentHorizontalAlignment(.trailing)
     }
     
+    /// 标准字体状态的垂直布局。
     private func setupVerticalLayoutConstraints() {
-        // 垂直布局更新
         NSLayoutConstraint.deactivate(horizontalLayoutConstraints)
+        NSLayoutConstraint.deactivate(verticalAccessibilityLayoutConstraints)
         NSLayoutConstraint.activate(verticalLayoutConstraints)
+        
+        updateSecondaryButtonContentHorizontalAlignment(.leading)
+        updateContextMenuButtonContentHorizontalAlignment(.leading)
+    }
+    
+    /// 大字体状态的垂直布局。
+    private func setupVerticalAccessibilityLayoutConstraints() {
+        NSLayoutConstraint.deactivate(horizontalLayoutConstraints)
+        NSLayoutConstraint.deactivate(verticalLayoutConstraints)
+        NSLayoutConstraint.activate(verticalAccessibilityLayoutConstraints)
         
         updateSecondaryButtonContentHorizontalAlignment(.leading)
         updateContextMenuButtonContentHorizontalAlignment(.leading)
@@ -316,6 +376,62 @@ extension RepeatBasicTableViewCell {
         let oneLineHeight = label.textRect(forBounds: contentView.bounds, limitedToNumberOfLines: 1).height
                 
         return oneLineHeight * CGFloat(numberOfLines)
+    }
+    
+    private func indentLabel(_ label: UILabel, text: String?, firstLineHeadIndent: CGFloat) {
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.firstLineHeadIndent = firstLineHeadIndent // 第一行的前方缩进空白。
+//        paragraphStyle.headIndent = 10 // 除了第一行之外其他行的前方缩进空白。
+        
+        guard let text = text else { return }
+                        
+        label.attributedText = NSAttributedString(string: text, attributes: [NSAttributedString.Key.paragraphStyle: paragraphStyle])
+    }
+    
+    /// 布局计算 cell。
+    @discardableResult
+    private func layoutContentView() -> CGFloat {
+        // 先切换为单行显示，计算出 label 内文字的真实宽度。
+        primaryLabel.numberOfLines = 1
+        primaryLabel.sizeToFit()
+        primaryLabel.numberOfLines = 0 // 然后再恢复为多行显示。
+
+        // 计算按钮的宽高。
+        secondaryButton.layoutIfNeeded()
+        secondaryButton.sizeToFit()
+
+        let secondaryButtonWidth = secondaryButton.bounds.width
+        let secondaryButtonHeight = secondaryButton.bounds.height //secondaryButton.titleLabel?.bounds.height ?? 0
+
+        // 水平布局时，primaryLabel 与 secondaryButton 显示区域的宽度。
+        let viewsAreaWidth = contentView.bounds.width - layoutMargins.left - layoutMargins.right
+
+        // primaryLabel 在单行显示下，内容的宽度。
+        let viewsWidth = primaryLabel.bounds.width + secondaryButtonWidth
+
+        // 计算多行显示下，primaryLabel 的高度。
+        let primaryLabelHeight = heightFor(label: primaryLabel, at: viewsAreaWidth)
+        
+        var height: CGFloat = 0
+
+        // 当两个控件的水平单行宽度超出两个控件的显示区域宽度时，改为垂直布局；否则为水平布局。
+        if viewsWidth < viewsAreaWidth {
+            // 水平布局
+            setupHorizontalLayoutConstraints()
+            isHorizontalLayout = true
+            isVerticalLayout = false
+            
+            height = (primaryLabelHeight == 0 ? secondaryButtonHeight : primaryLabelHeight) + layoutMargins.top + layoutMargins.bottom
+        } else {
+            // 垂直布局
+            setupVerticalLayoutConstraints()
+            isHorizontalLayout = false
+            isVerticalLayout = true
+            
+            height = primaryLabelHeight + secondaryButtonHeight + layoutMargins.top + layoutMargins.bottom + verticalSpacing
+        }
+        
+        return height
     }
     
     /// 更新占位按钮的水平对齐。

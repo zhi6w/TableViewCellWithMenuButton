@@ -13,12 +13,15 @@ class Item: NSObject {
     
     var secondaryText: String?
     
+    var image: UIImage?
+    
     var menu: UIMenu?
     
     
-    init(text: String? = nil, secondaryText: String? = nil, menu: UIMenu? = nil, isExpanded: Bool = false) {
+    init(text: String? = nil, secondaryText: String? = nil, image: UIImage? = nil, menu: UIMenu? = nil) {
         self.text = text
         self.secondaryText = secondaryText
+        self.image = image
         self.menu = menu
     }
     

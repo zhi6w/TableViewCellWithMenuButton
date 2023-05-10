@@ -15,6 +15,7 @@ class RepeatTableViewCell: RepeatBasicTableViewCell {
             
             text = item.text
             secondaryText = item.secondaryText
+            image = item.image
             menu = item.menu
         }
     }
