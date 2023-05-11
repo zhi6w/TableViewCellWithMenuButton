@@ -307,7 +307,7 @@ extension RepeatBasicTableViewCell {
             // Secondary Label
             secondaryButton.leadingAnchor.constraint(equalTo: primaryLabel.leadingAnchor),
             secondaryButton.trailingAnchor.constraint(equalTo: primaryLabel.trailingAnchor),
-            secondaryButton.topAnchor.constraint(equalTo: primaryLabel.bottomAnchor, constant: verticalSpacing),            
+            secondaryButton.topAnchor.constraint(equalTo: primaryLabel.bottomAnchor, constant: verticalSpacing),
             secondaryButton.bottomAnchor.constraint(equalTo: compressedContentView.bottomAnchor)
         ]
     }
@@ -407,8 +407,10 @@ extension RepeatBasicTableViewCell {
         let secondaryButtonWidth = secondaryButton.bounds.width
         let secondaryButtonHeight = secondaryButton.bounds.height //secondaryButton.titleLabel?.bounds.height ?? 0
 
-        // 水平布局时，primaryLabel 与 secondaryButton 显示区域的宽度。
+        // 水平或垂直布局时，primaryLabel 与 secondaryButton 显示区域的宽度。
         var viewsAreaWidth = contentView.bounds.width - layoutMargins.left - layoutMargins.right
+        
+        primaryLabel.preferredMaxLayoutWidth = viewsAreaWidth
         
         leftImageView.layoutIfNeeded()
         viewsAreaWidth -= leftImageView.bounds.width
