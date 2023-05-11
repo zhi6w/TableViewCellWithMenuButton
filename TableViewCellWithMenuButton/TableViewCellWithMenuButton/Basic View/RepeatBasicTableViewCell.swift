@@ -418,7 +418,11 @@ extension RepeatBasicTableViewCell {
         let secondaryButtonHeight = secondaryButton.bounds.height //secondaryButton.titleLabel?.bounds.height ?? 0
 
         // 水平布局时，primaryLabel 与 secondaryButton 显示区域的宽度。
-        let viewsAreaWidth = contentView.bounds.width - layoutMargins.left - layoutMargins.right
+        var viewsAreaWidth = contentView.bounds.width - layoutMargins.left - layoutMargins.right
+        
+        leftImageView.layoutIfNeeded()
+        viewsAreaWidth -= leftImageView.bounds.width
+        viewsAreaWidth -= (leftImageView.bounds.width != 0 ? primaryLabelFirstLineHeadIndent : 0)
 
         // primaryLabel 在单行显示下，内容的宽度。
         let viewsWidth = primaryLabel.bounds.width + secondaryButtonWidth
