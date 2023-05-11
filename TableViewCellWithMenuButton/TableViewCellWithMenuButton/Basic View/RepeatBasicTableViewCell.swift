@@ -157,7 +157,8 @@ extension RepeatBasicTableViewCell {
         NSLayoutConstraint.activate([
             compressedContentView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             compressedContentView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
-            compressedContentView.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor)
+            compressedContentView.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor),
+            compressedContentView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor)
         ])
     }
     
@@ -272,10 +273,7 @@ extension RepeatBasicTableViewCell {
             // Secondary Button
             secondaryButton.trailingAnchor.constraint(equalTo: compressedContentView.trailingAnchor),
             secondaryButton.topAnchor.constraint(equalTo: primaryLabel.topAnchor),
-            secondaryButton.bottomAnchor.constraint(equalTo: primaryLabel.bottomAnchor),
-            
-            // Compressed Content View
-            compressedContentView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor)
+            secondaryButton.bottomAnchor.constraint(equalTo: primaryLabel.bottomAnchor)
         ]
   
         verticalLayoutConstraints = [
@@ -292,10 +290,7 @@ extension RepeatBasicTableViewCell {
             secondaryButton.leadingAnchor.constraint(equalTo: primaryLabel.leadingAnchor),
             secondaryButton.trailingAnchor.constraint(equalTo: primaryLabel.trailingAnchor),
             secondaryButton.topAnchor.constraint(equalTo: primaryLabel.bottomAnchor, constant: verticalSpacing),
-            secondaryButton.bottomAnchor.constraint(equalTo: compressedContentView.bottomAnchor),
-            
-            // Compressed Content View
-            compressedContentView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor)
+            secondaryButton.bottomAnchor.constraint(equalTo: compressedContentView.bottomAnchor)
         ]
         
         // 大字体下的垂直布局。
@@ -312,13 +307,8 @@ extension RepeatBasicTableViewCell {
             // Secondary Label
             secondaryButton.leadingAnchor.constraint(equalTo: primaryLabel.leadingAnchor),
             secondaryButton.trailingAnchor.constraint(equalTo: primaryLabel.trailingAnchor),
-            secondaryButton.topAnchor.constraint(equalTo: primaryLabel.bottomAnchor, constant: verticalSpacing),
-            
-            // lessThanOrEqualTo 保证 secondaryLabel 不会在收缩动画还未结束时，出现跳动的问题。同时为了防止出现模糊约束的警告。
-            secondaryButton.bottomAnchor.constraint(equalTo: compressedContentView.bottomAnchor),
-            
-            // Compressed Content View
-            compressedContentView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor)
+            secondaryButton.topAnchor.constraint(equalTo: primaryLabel.bottomAnchor, constant: verticalSpacing),            
+            secondaryButton.bottomAnchor.constraint(equalTo: compressedContentView.bottomAnchor)
         ]
     }
     
