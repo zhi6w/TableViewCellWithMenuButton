@@ -440,7 +440,6 @@ extension RepeatBasicTableViewCell {
             isVerticalLayout = true
             
             height = primaryLabelHeight + secondaryButtonHeight + layoutMargins.top + layoutMargins.bottom + verticalSpacing
-            print(">>>>", primaryLabelHeight, secondaryButtonHeight, layoutMargins, verticalSpacing)
         }
         
         return height
