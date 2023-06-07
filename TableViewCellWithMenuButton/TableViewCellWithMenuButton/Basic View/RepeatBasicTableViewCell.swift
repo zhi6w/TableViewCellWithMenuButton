@@ -409,13 +409,13 @@ extension RepeatBasicTableViewCell {
 
         // 水平或垂直布局时，primaryLabel 与 secondaryButton 显示区域的宽度。
         var viewsAreaWidth = contentView.bounds.width - layoutMargins.left - layoutMargins.right
-        
-        primaryLabel.preferredMaxLayoutWidth = viewsAreaWidth
-        
+                
         leftImageView.layoutIfNeeded()
         viewsAreaWidth -= leftImageView.bounds.width
         viewsAreaWidth -= (leftImageView.bounds.width != 0 ? primaryLabelFirstLineHeadIndent : 0)
 
+        primaryLabel.preferredMaxLayoutWidth = viewsAreaWidth
+        
         // primaryLabel 在单行显示下，内容的宽度。
         let viewsWidth = primaryLabel.bounds.width + secondaryButtonWidth
 
@@ -440,6 +440,7 @@ extension RepeatBasicTableViewCell {
             isVerticalLayout = true
             
             height = primaryLabelHeight + secondaryButtonHeight + layoutMargins.top + layoutMargins.bottom + verticalSpacing
+            print(">>>>", primaryLabelHeight, secondaryButtonHeight, layoutMargins, verticalSpacing)
         }
         
         return height
