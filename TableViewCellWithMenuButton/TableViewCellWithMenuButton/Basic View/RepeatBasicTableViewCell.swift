@@ -127,6 +127,18 @@ class RepeatBasicTableViewCell: UITableViewCell {
         // 在 tableView 自动布局下，返回正确的高度。
         return CGSize(width: size.width, height: height)
     }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        
+        updateLayoutConstraints()
+        
+//        let isAccessibilityCategory = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+//        super.traitCollectionDidChange(previousTraitCollection)
+//        
+//        if isAccessibilityCategory != previousTraitCollection?.preferredContentSizeCategory.isAccessibilityCategory {
+//            print("-----")
+//        }
+    }
 
 }
 
@@ -136,7 +148,7 @@ extension RepeatBasicTableViewCell {
         
         clipsToBounds = true
         
-        NotificationCenter.default.addObserver(self, selector: #selector(contentSizeCategoryDidChange(_:)), name: UIContentSizeCategory.didChangeNotification, object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(contentSizeCategoryDidChange(_:)), name: UIContentSizeCategory.didChangeNotification, object: nil)
         
         setupCompressedContentView()
         setupLeftImageView()
@@ -423,6 +435,8 @@ extension RepeatBasicTableViewCell {
         let primaryLabelHeight = heightFor(label: primaryLabel, at: viewsAreaWidth)
         
         var height: CGFloat = 0
+        
+        compressedContentView.layoutIfNeeded()
 
         // 当两个控件的水平单行宽度超出两个控件的显示区域宽度时，改为垂直布局；否则为水平布局。
         if viewsWidth < viewsAreaWidth {
